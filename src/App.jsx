@@ -1,8 +1,11 @@
 import { useState } from "react"
+import Header from "./components/Header";
 
 const App = () => {
   return (
-    <h1>Control de Gastos</h1>
+    <>
+      <Header />
+    </>
   )
 }
 
