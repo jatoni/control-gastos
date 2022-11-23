@@ -2,6 +2,7 @@ import { useState } from "react"
 import Header from "./components/Header";
 import Modal from "./components/Modal";
 import IconNuevoGasto from './img/nuevo-gasto.svg';
+import { generarId } from './helpers'
 
 
 const App = () => {
@@ -9,12 +10,24 @@ const App = () => {
   const [valid, setValid] = useState(false);
   const [modal, setModal] = useState(false);
   const [animar, setAnimar] = useState(false);
+  const [gastos, setGastos] = useState([]);
 
-  const handleNuevoGasto = () =>{
+  const handleNuevoGasto = () => {
     setModal(true);
     setTimeout(() => {
       setAnimar(true);
     }, 500)
+  }
+
+  const guadarGasto = gasto => {
+    gasto.id = generarId();
+    setGastos([...gastos, gasto])
+    
+    setTimeout(() => {
+      setModal(false);
+    }, 500)
+    setAnimar(false);
+
   }
   return (
     <>
@@ -34,7 +47,12 @@ const App = () => {
         </div>
       )}
 
-      {modal && (<Modal setModal={setModal} animar={animar} setAnimar={setAnimar} />)}
+      {modal && (<Modal
+        setModal={setModal}
+        animar={animar}
+        setAnimar={setAnimar}
+        guadarGasto={guadarGasto}
+      />)}
     </>
   )
 }

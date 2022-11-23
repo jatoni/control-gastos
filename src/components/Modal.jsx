@@ -1,18 +1,34 @@
 import { useState } from "react"
 import CerrarBtn from '../img/cerrar.svg'
+import Mensaje from "./Mensaje";
 
 
-const Modal = ({ setModal, animar, setAnimar }) => {
+const Modal = ({ setModal, animar, setAnimar, guadarGasto }) => {
 
     const [nombre, setNombre] = useState("");
     const [cantidad, setCantidad] = useState(0);
     const [categoria, setCategoria] = useState("");
+    const [mensaje, setMensaje] = useState("");
 
     const ocultarModal = () => {
         setTimeout(() => {
             setModal(false);
         }, 500)
         setAnimar(false);
+    }
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        if ([nombre, categoria].includes("") || [cantidad].includes(0)) {
+            setMensaje("Todos los campos son obligatorios");
+
+            setTimeout(() => {
+                setMensaje("");
+            }, 3000);
+            return;
+        }
+
+        guadarGasto({nombre, cantidad, categoria})
     }
 
     return (
@@ -24,12 +40,19 @@ const Modal = ({ setModal, animar, setAnimar }) => {
                     onClick={ocultarModal}
                 />
             </div>
-            <form className={`formulario ${animar ? 'animar' : 'cerrar'}`}>
+            <form
+                onSubmit={handleSubmit}
+                className={`formulario ${animar ? 'animar' : 'cerrar'}`}
+            >
                 <legend className="">Nuevo Gasto</legend>
+
+                {mensaje &&
+                    (<Mensaje tipo="error">{mensaje}</Mensaje>)
+                }
 
                 <div className="campo">
                     <label htmlFor="nombre">Nombre gasto</label>
-                    <input 
+                    <input
                         type="text"
                         placeholder="Ingrese el nombre del gasto"
                         id="nombre"
@@ -40,7 +63,7 @@ const Modal = ({ setModal, animar, setAnimar }) => {
 
                 <div className="campo">
                     <label htmlFor="cantidad">Cantidad</label>
-                    <input 
+                    <input
                         type="number"
                         placeholder="Ingrese la cantidad del gasto: ej.300"
                         id="cantidad"
