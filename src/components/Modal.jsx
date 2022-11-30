@@ -2,7 +2,6 @@ import { useState } from "react"
 import CerrarBtn from '../img/cerrar.svg'
 import Mensaje from "./Mensaje";
 
-
 const Modal = ({ setModal, animar, setAnimar, guadarGasto }) => {
 
     const [nombre, setNombre] = useState("");
