@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Modal from "./components/Modal";
 import IconNuevoGasto from "./img/nuevo-gasto.svg";
@@ -12,22 +12,49 @@ const App = () => {
   const [animar, setAnimar] = useState(false);
   const [gastos, setGastos] = useState([]);
 
+  const [gastoEditar, setGastoEditar] = useState({});
+  useEffect(() => {
+    if (Object.keys(gastoEditar).length > 0) {
+      setModal(true);
+      setTimeout(() => {
+        setAnimar(true);
+      }, 500);
+    }
+  }, [gastoEditar])
+
   const handleNuevoGasto = () => {
     setModal(true);
+    setGastoEditar({})
     setTimeout(() => {
       setAnimar(true);
     }, 500);
   };
 
   const guadarGasto = gasto => {
-    gasto.id = generarId();
-    gasto.fecha = Date.now();
-    setGastos([...gastos, gasto]);
+    console.log(gasto)
+    if(gasto.id){
+      // Actualizar
+      const gastosActualizados = gastos.map(gastoState => gastoState.id === gasto.id ? gasto : gastoState)
+      setGastos(gastosActualizados)
+      setGastoEditar({})
+    }else{
+      // Nuevo
+      gasto.id = generarId();
+      gasto.fecha = Date.now();
+      setGastos([...gastos, gasto]);
+    }
+
     setTimeout(() => {
       setModal(false);
     }, 500);
     setAnimar(false);
-  };
+  }
+
+  const eliminarGastos = id => {
+    const gastosActualizados = gastos.filter(gasto => gasto.id !== id);
+    setGastos(gastosActualizados);
+  }
+
   return (
     <div className={modal ? "fijar" : ''}>
       <Header
@@ -40,7 +67,11 @@ const App = () => {
       {valid && (
         <>
           <main>
-            <ListadoGastos gastos={gastos} />
+            <ListadoGastos
+              gastos={gastos}
+              setGastoEditar={setGastoEditar}
+              eliminarGastos={eliminarGastos}
+            />
           </main>
           <div className="nuevo-gasto">
             <img
@@ -58,6 +89,8 @@ const App = () => {
           animar={animar}
           setAnimar={setAnimar}
           guadarGasto={guadarGasto}
+          gastoEditar={gastoEditar}
+          setGastoEditar={setGastoEditar}
         />
       )}
     </div>
