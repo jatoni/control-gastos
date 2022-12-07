@@ -4,13 +4,21 @@ import Modal from "./components/Modal";
 import IconNuevoGasto from "./img/nuevo-gasto.svg";
 import { generarId } from "./helpers";
 import ListadoGastos from "./components/ListadoGastos";
+import Filtros from "./components/Filtros";
 
 const App = () => {
-  const [presupuesto, setPresupuesto] = useState(0);
+  const [presupuesto, setPresupuesto] = useState(
+    localStorage.getItem('presupuesto') ?? 0
+  );
   const [valid, setValid] = useState(false);
   const [modal, setModal] = useState(false);
   const [animar, setAnimar] = useState(false);
-  const [gastos, setGastos] = useState([]);
+  const [gastos, setGastos] = useState(
+    localStorage.getItem('gastos') ? JSON.parse(localStorage.getItem('gastos')) : []
+  );
+
+  const [filtro, setFiltro] = useState("");
+  const [gastosfiltrados, setGastosFiltrados] = useState([]);
 
   const [gastoEditar, setGastoEditar] = useState({});
   useEffect(() => {
@@ -22,6 +30,30 @@ const App = () => {
     }
   }, [gastoEditar])
 
+  useEffect(() => {
+    Number(localStorage.setItem('presupuesto', presupuesto ?? 0));
+  }, [presupuesto])
+
+  useEffect(() => {
+    localStorage.setItem('gastos', JSON.stringify(gastos) ?? []);
+  }, [gastos])
+
+  useEffect(() => {
+    if(filtro){
+      // Filtrar gastos por categoria
+      const gastosFiltrados = gastos.filter(gasto => gasto.categoria === filtro)
+      setGastosFiltrados(gastosFiltrados)
+    }
+  }, [filtro])
+
+  useEffect(() => {
+    const presupuestoLS = Number(localStorage.getItem('presupuesto')) ?? 0;
+    if (presupuestoLS > 0) {
+      setValid(true);
+    }
+
+  }, [])
+
   const handleNuevoGasto = () => {
     setModal(true);
     setGastoEditar({})
@@ -32,12 +64,12 @@ const App = () => {
 
   const guadarGasto = gasto => {
     console.log(gasto)
-    if(gasto.id){
+    if (gasto.id) {
       // Actualizar
       const gastosActualizados = gastos.map(gastoState => gastoState.id === gasto.id ? gasto : gastoState)
       setGastos(gastosActualizados)
       setGastoEditar({})
-    }else{
+    } else {
       // Nuevo
       gasto.id = generarId();
       gasto.fecha = Date.now();
@@ -67,6 +99,10 @@ const App = () => {
       {valid && (
         <>
           <main>
+            <Filtros
+              filtro={filtro}
+              setFiltro={setFiltro}
+            />
             <ListadoGastos
               gastos={gastos}
               setGastoEditar={setGastoEditar}
